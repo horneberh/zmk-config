@@ -14,7 +14,6 @@
 #define LOWER  1
 #define RAISE  2
 #define ADJUST 3
-#define UMLAUT 4
 
 / {
     // Activate ADJUST layer by pressing raise and lower
@@ -34,11 +33,10 @@
         default_layer {
             display-name = "default";
 
-            // QWERTZ-korrigiert für deutsches OS-Layout.
-            // Alle Keycodes sind US-HID; die DE-OS-Belegung bestimmt das angezeigte Zeichen.
-            // Y/Z getauscht (physisch: Z-Taste links, Y-Taste rechts).
-            // SEMI → ö, SQT → ä (nativ über DE-OS ohne Layer).
-            // RGUI (Tap) = GUI/Cmd; RGUI (Hold) = Umlaut-Layer.
+            // Standard-US-Keycodes; das deutsche OS-Layout macht daraus QWERTZ.
+            // Y-Taste→z, Z-Taste→y erledigt das OS automatisch — KEIN Tausch im keymap.
+            // SEMI → ö, SQT → ä (nativ über DE-OS).
+            // Umlaute ä ö ü ß und < > liegen auf RAISE (siehe unten). Daumen außen = GUI/Cmd.
             // -----------------------------------------------------------------------
             // |  ESC  |  1  |  2  |  3  |  4  |  5  |           |  6  |  7  |  8  |  9  |  0  |  ^  |
             // | CAPS  |  Q  |  W  |  E  |  R  |  T  |           |  Z  |  U  |  I  |  O  |  P  | BSP |
@@ -48,10 +46,10 @@
 
             bindings = <
 &kp ESC       &kp N1  &kp N2     &kp N3    &kp N4    &kp N5                             &kp N6     &kp N7     &kp N8     &kp N9    &kp N0    &kp GRAVE
-&kp CAPSLOCK  &kp Q   &kp W      &kp E     &kp R     &kp T      &kp Z                              &kp U      &kp I      &kp O     &kp P     &kp BSPC
+&kp CAPSLOCK  &kp Q   &kp W      &kp E     &kp R     &kp T      &kp Y                              &kp U      &kp I      &kp O     &kp P     &kp BSPC
 &kp TAB       &kp A   &kp S      &kp D     &kp F     &kp G      &kp H                              &kp J      &kp K      &kp L     &kp SEMI  &kp SQT
-&kp LSHFT     &kp Y   &kp X      &kp C     &kp V     &kp B      &kp C_MUTE  &kp C_PLAY  &kp N      &kp M      &kp COMMA  &kp DOT   &kp FSLH  &kp RSHFT
-                       &kp LCTRL  &kp LALT  &kp LGUI  &mo LOWER  &kp RET     &kp SPACE   &mo RAISE  &kp RCTRL  &kp RALT   &lt UMLAUT RGUI
+&kp LSHFT     &kp Z   &kp X      &kp C     &kp V     &kp B      &kp C_MUTE  &kp C_PLAY  &kp N      &kp M      &kp COMMA  &kp DOT   &kp FSLH  &kp RSHFT
+                       &kp LCTRL  &kp LALT  &kp LGUI  &mo LOWER  &kp RET     &kp SPACE   &mo RAISE  &kp RCTRL  &kp RALT   &kp RGUI
             >;
 
             sensor-bindings = <&inc_dec_kp C_VOL_DN C_VOL_UP &inc_dec_kp C_PREV C_NEXT>;
@@ -90,18 +88,20 @@
         raise_layer {
             display-name = "raise";
 
+            // Umlaute auf der linken oberen Reihe: ä ö ü ß.  < auf der y-Taste (Shift = >).
+            // < / > brauchst du für den Fensterwechsel: GUI + RAISE + y-Taste = Cmd+< .
             // ------------------------------------------------------------------------------------------------------------
             // | BTCLR | BT1  | BT2  |  BT3  |  BT4  |  BT5 |                |      |      |       |      |       |       |
-            // |       | INS  | PSCR | GUI   |       |      |                | PGUP |      |   ^   |      |       |       |
+            // |       |  ä   |  ö   |  ü    |  ß    |      |                | PGUP |      |   ^   |      |       |       |
             // |       | ALT  | CTRL | SHIFT |       | CAPS |                | PGDN |   <- |   v   |  ->  |  DEL  | BKSPC |
-            // |       | UNDO | CUT  | COPY  | PASTE | STUD |      |  |      |      |      |       |      |       |       |
+            // |       |  <   | CUT  | COPY  | PASTE | STUD |      |  |      |      |      |       |      |       |       |
             //                |      |       |       |      |      |  |      |      |      |       |      |
 
             bindings = <
 &bt BT_CLR  &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3  &bt BT_SEL 4                       &trans  &trans    &trans    &trans     &trans   &trans
-&trans      &kp INS       &kp PSCRN     &kp K_CMENU   &trans        &trans          &kp PG_UP                  &trans    &kp UP    &trans     &trans   &trans
+&trans      &kp SQT       &kp SEMI      &kp LBKT      &kp MINUS     &trans          &kp PG_UP                  &trans    &kp UP    &trans     &trans   &trans
 &trans      &kp LALT      &kp LCTRL     &kp LSHFT     &trans        &kp CLCK        &kp PG_DN                  &kp LEFT  &kp DOWN  &kp RIGHT  &kp DEL  &kp BSPC
-&trans      &kp K_UNDO    &kp K_CUT     &kp K_COPY    &kp K_PASTE   &studio_unlock  &trans     &trans  &trans  &trans    &trans    &trans     &trans   &trans
+&trans      &kp NON_US_BSLH &kp K_CUT   &kp K_COPY    &kp K_PASTE   &studio_unlock  &trans     &trans  &trans  &trans    &trans    &trans     &trans   &trans
                           &trans        &trans        &trans        &trans          &trans     &trans  &trans  &trans    &trans    &trans
             >;
 
@@ -126,35 +126,5 @@
             >;
         };
 
-        umlaut_layer {
-            display-name = "umlaut";
-
-            // Aktivierung: RGUI halten (rechter Daumen).
-            // Tap-Verhalten von RGUI bleibt erhalten (GUI/Cmd).
-            // Alle nicht belegten Tasten sind transparent (fall-through zu BASE).
-            //
-            // Belegung (DE-OS-Ausgabe, da OS auf Deutsch):
-            //   A → ä  (SQT-Keycode, DE-OS: ä)
-            //   S → ß  (MINUS-Keycode, DE-OS: ß)
-            //   U → ü  (LBKT-Keycode, DE-OS: ü)
-            //   O → ö  (SEMI-Keycode, DE-OS: ö)
-            //
-            // Shift + A/U/O → Ä/Ü/Ö (funktioniert automatisch via OS).
-            // Shift + S → ? (kein deutsches ẞ auf Standard-Tastaturen).
-            // -----------------------------------------------------------------------
-            // |      |     |     |     |     |     |           |     |     |     |     |     |     |
-            // |      |     |     |     |     |     |           |     |  ü  |     |  ö  |     |     |
-            // |      |  ä  |  ß  |     |     |     |           |     |     |     |     |     |     |
-            // |      |     |     |     |     |     |    | |    |     |     |     |     |     |     |
-            //               |     |     |     |     |    | |    |     |     |     | [hold]
-
-            bindings = <
-&trans  &trans     &trans     &trans  &trans  &trans     &trans                         &trans  &trans  &trans     &trans  &trans
-&trans  &trans     &trans     &trans  &trans  &trans     &trans  &kp LBKT  &trans  &kp SEMI  &trans  &trans
-&trans  &kp SQT    &kp MINUS  &trans  &trans  &trans     &trans            &trans  &trans    &trans  &trans  &trans
-&trans  &trans     &trans     &trans  &trans  &trans     &trans  &trans    &trans  &trans    &trans  &trans  &trans  &trans
-                   &trans     &trans  &trans  &trans     &trans  &trans    &trans  &trans    &trans  &trans
-            >;
-        };
     };
 };
